@@ -14,3 +14,11 @@ class PostUpdate(BaseModel):
 
 class PostDelete(BaseModel):
     id: int
+
+
+class PostRead(BaseModel):
+    id: int
+    title: str
+    content: str
+    author: str | None = None
+    created_at: datetime
