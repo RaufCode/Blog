@@ -9,3 +9,8 @@ async def create_post(db: AsyncSession, data: PostCreate) -> Post:
     await db.commit()
     await db.refresh(post)
     return post
+
+
+async def get_posts(db: AsyncSession) -> Post:
+    result = await db.execute(select(Post))
+    return result.scalars().all()
