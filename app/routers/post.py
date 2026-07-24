@@ -28,3 +28,10 @@ async def update_post(post_id: int, data: PostUpdate, db: AsyncSession = Depends
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
     return await post_crud.update_post(db, post, data)
+
+@router.delete("/{post_id}", status_code=204)
+async def delete_post(post_id: int, db: AsyncSession = Depends(get_db)):
+    post = await post_crud.get_post(db, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    await post_crud.delete_post(db, post)
