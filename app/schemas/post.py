@@ -11,3 +11,6 @@ class PostUpdate(BaseModel):
     title: str | None = None
     content: str | None = None
     author: str | None = None
+
+class PostDelete(BaseModel):
+    id: int
