@@ -19,3 +19,10 @@ async def get_posts(db: AsyncSession) -> Post:
 async def get_post(db: AsyncSession, post_id: int) -> Post | None:
     result = await db.execute(select(Post).where(Post.id == post_id))
     return result.scalar_one_or_none()
+
+async def update_post(db: AsyncSession, post: Post, data: PostUpdate) -> Post:
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(post, field, value)
+    await db.commit()
+    await db.refresh(post)
+    return post
