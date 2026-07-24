@@ -21,3 +21,10 @@ async def read_post(post_id: int, db: AsyncSession = Depends(get_db)):
 @router.get("/", response_model=list[PostRead])
 async def read_post(db: AsyncSession = Depends(get_db)):
     return await post_crud.get_posts(db)
+
+@router.put("/{post_id}", response_model=PostRead)
+async def update_post(post_id: int, data: PostUpdate, db: AsyncSession = Depends(get_db)):
+    post = await post_crud.get_post(db, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return await post_crud.update_post(db, post, data)
