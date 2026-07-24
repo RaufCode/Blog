@@ -17,3 +17,7 @@ async def read_post(post_id: int, db: AsyncSession = Depends(get_db)):
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
     return post
+
+@router.get("/", response_model=list[PostRead])
+async def read_post(db: AsyncSession = Depends(get_db)):
+    return await post_crud.get_posts(db)
