@@ -26,3 +26,7 @@ async def update_post(db: AsyncSession, post: Post, data: PostUpdate) -> Post:
     await db.commit()
     await db.refresh(post)
     return post
+
+async def delete_post(db: AsyncSession, post: Post) -> None:
+    await db.delete(post)
+    await db.commit()
