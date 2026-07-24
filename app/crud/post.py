@@ -14,3 +14,8 @@ async def create_post(db: AsyncSession, data: PostCreate) -> Post:
 async def get_posts(db: AsyncSession) -> Post:
     result = await db.execute(select(Post))
     return result.scalars().all()
+
+
+async def get_post(db: AsyncSession, post_id: int) -> Post | None:
+    result = await db.execute(select(Post).where(Post.id == post_id))
+    return result.scalar_one_or_none()
