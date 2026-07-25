@@ -30,7 +30,7 @@ function formatDate(value) {
         <p v-else-if="error" class="state-message state-message--error">Couldn't load posts. Please try again later.</p>
         <p v-else-if="!posts || !posts.length" class="state-message">No posts yet.</p>
         <template v-else>
-            <article v-for="post in posts" :key="post.id" class="post">
+            <NuxtLink v-for="post in posts" :key="post.id" :to="`/post/${post.id}`" class="post">
                 <h2 class="post-title">{{ post.title }}</h2>
                 <div class="post-meta">
                     <span class="avatar">{{ initials(post.author) }}</span>
@@ -41,7 +41,7 @@ function formatDate(value) {
                     <span class="read-time">{{ readTime(post.content) }}</span>
                 </div>
                 <p class="post-body">{{ post.content }}</p>
-            </article>
+            </NuxtLink>
         </template>
     </div>
 </template>
@@ -110,15 +110,22 @@ function formatDate(value) {
 }
 
 .post {
+    display: block;
     padding-top: 36px;
     margin-top: 36px;
     border-top: 1px solid var(--color-border);
+    color: inherit;
+    text-decoration: none;
 }
 
 .post:first-of-type {
     padding-top: 0;
     margin-top: 0;
     border-top: none;
+}
+
+.post:hover .post-title {
+    color: var(--color-accent);
 }
 
 .post-title {
