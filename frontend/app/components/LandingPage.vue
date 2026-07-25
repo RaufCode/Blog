@@ -128,6 +128,11 @@ function formatDate(value) {
     line-height: 1.2;
     margin: 0 0 14px 0;
     letter-spacing: -0.01em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .post-meta {
@@ -157,6 +162,10 @@ function formatDate(value) {
 .author {
     font-size: 13px;
     font-weight: 600;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .meta-sep,
@@ -172,6 +181,11 @@ function formatDate(value) {
     color: var(--color-body);
     white-space: pre-wrap;
     margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 @media (max-width: 480px) {
