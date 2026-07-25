@@ -1,0 +1,27 @@
+:root {
+  --color-bg: oklch(0.99 0.002 90);
+  --color-text: oklch(0.22 0.01 90);
+  --color-text-muted: oklch(0.5 0.01 90);
+  --color-text-faint: oklch(0.55 0.01 90);
+  --color-body: oklch(0.25 0.01 90);
+  --color-border: oklch(0.91 0.006 90);
+  --color-accent: oklch(0.55 0.16 260);
+  --color-accent-bg: oklch(0.94 0.03 260);
+  --color-accent-text: oklch(0.5 0.14 260);
+  --color-accent-contrast: oklch(0.98 0.01 260);
+  --color-error: oklch(0.55 0.18 25);
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Lora', serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
