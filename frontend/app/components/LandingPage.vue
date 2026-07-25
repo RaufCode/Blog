@@ -48,7 +48,7 @@ function formatDate(value) {
 
 <style scoped>
 .page {
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 auto;
     padding: 56px 24px 96px;
     font-family: var(--font-sans);
@@ -96,8 +96,10 @@ function formatDate(value) {
 
 .page-subtitle {
     font-size: 15px;
+    line-height: 1.65;
     color: var(--color-text-muted);
-    margin: 0 0 40px 0;
+    max-width: 58ch;
+    margin: 0 0 44px 0;
 }
 
 .state-message {
@@ -184,8 +186,9 @@ function formatDate(value) {
 
 .post-body {
     font-size: 15px;
-    line-height: 1.75;
+    line-height: 1.8;
     color: var(--color-body);
+    max-width: 66ch;
     white-space: pre-wrap;
     margin: 0;
     display: -webkit-box;

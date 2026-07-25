@@ -21,6 +21,13 @@ function readTime(content) {
 function formatDate(value) {
   return new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
+
+function paragraphs(content) {
+  return (content || '')
+    .split(/\n{2,}/)
+    .map(paragraph => paragraph.trim())
+    .filter(Boolean)
+}
 </script>
 
 <template>
@@ -42,14 +49,16 @@ function formatDate(value) {
                 <span class="meta-sep">·</span>
                 <span class="read-time">{{ readTime(post.content) }}</span>
             </div>
-            <p class="post-body">{{ post.content }}</p>
+            <div class="post-body">
+                <p v-for="(paragraph, index) in paragraphs(post.content)" :key="index">{{ paragraph }}</p>
+            </div>
         </article>
     </div>
 </template>
 
 <style scoped>
 .page {
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 auto;
     padding: 56px 24px 96px;
     font-family: var(--font-sans);
@@ -96,6 +105,11 @@ function formatDate(value) {
 
 .state-message--error {
     color: var(--color-error);
+}
+
+.post {
+    max-width: 68ch;
+    margin: 0 auto;
 }
 
 .post-title {
@@ -145,10 +159,16 @@ function formatDate(value) {
 
 .post-body {
     font-size: 17px;
-    line-height: 1.8;
+    line-height: 1.85;
     color: var(--color-body);
-    white-space: pre-wrap;
+}
+
+.post-body p {
     margin: 0;
+}
+
+.post-body p + p {
+    margin-top: 1.35em;
 }
 
 @media (max-width: 480px) {
