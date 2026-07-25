@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <style>doc-page:not(:defined){visibility:hidden}</style>
+  <script src="./doc-page.js"></script>
+</helmet>
+
+<doc-page margin="0.85in" style="font-family: 'Inter', sans-serif; color: oklch(0.22 0.01 90);">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+    <div style="width: 26px; height: 26px; border-radius: 7px; background: oklch(0.55 0.16 260); display: flex; align-items: center; justify-content: center;">
+      <div style="width: 10px; height: 10px; background: oklch(0.98 0.01 260); border-radius: 3px;"></div>
+    </div>
+    <span style="font-weight: 800; font-size: 18px; letter-spacing: -0.02em;">Signal</span>
+  </div>
+  <h1 style="font-family: 'Lora', serif; font-size: 34px; font-weight: 600; margin: 0 0 6px 0; letter-spacing: -0.01em;">Notes on building software</h1>
+  <p style="font-size: 15px; color: oklch(0.5 0.01 90); margin: 0 0 34px 0;">A compiled reading of every post on Signal — engineering, product and career writing.</p>
+
+  <sc-for list="{{ posts }}" as="post" hint-placeholder-count="6">
+    <section style="break-before: page; break-inside: avoid;">
+      <span style="font-size: 11px; font-weight: 700; color: oklch(0.5 0.14 260); background: oklch(0.94 0.03 260); padding: 3px 9px; border-radius: 999px;">{{ post.tag }}</span>
+      <h2 style="font-family: 'Lora', serif; font-size: 26px; font-weight: 700; line-height: 1.2; margin: 14px 0 10px 0; letter-spacing: -0.01em;">{{ post.title }}</h2>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid oklch(0.91 0.006 90);">
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: oklch(0.55 0.16 260); color: white; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">{{ post.initials }}</div>
+        <span style="font-size: 13px; font-weight: 600;">{{ post.author }}</span>
+        <span style="font-size: 13px; color: oklch(0.55 0.01 90);">· {{ post.date }} · {{ post.readTime }}</span>
+      </div>
+      <div dangerouslySetInnerHTML="{{ post.bodyHtml }}" style="font-size: 15px; line-height: 1.75; color: oklch(0.25 0.01 90);"></div>
+    </section>
+  </sc-for>
+</doc-page>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+function readTime(html) {
+  const words = html.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length;
+  return Math.max(1, Math.round(words / 200)) + ' min read';
+}
+
+const SEED_POSTS = [
+  {
+    id: 1, title: 'Why we rewrote our API in three weeks', tag: 'Engineering',
+    author: 'Ada Kim', date: 'Jul 18, 2026',
+    body: '<p>Six months ago our onboarding endpoint averaged 900ms. That number kept us up at night, and eventually forced a full rewrite.</p><h2>The bottleneck</h2><p>Most of the latency lived in a serialization layer none of us had touched in years. Once we profiled it properly, the fix was almost embarrassingly simple.</p><ul><li>Cut N+1 queries in the post loader</li><li>Moved image resizing off the request path</li><li>Cached tag lookups at the edge</li></ul><p>Three weeks later, median latency was 210ms. Here is what we would tell our past selves.</p>'
+  },
+  {
+    id: 2, title: 'Designing a CRUD app that feels alive', tag: 'Product',
+    author: 'Marcus Lee', date: 'Jul 15, 2026',
+    body: '<p>Most CRUD interfaces get treated as an afterthought. That is a mistake — it is the interface your users touch the most.</p><h2>Confirm the risky stuff</h2><p>Deletes deserve friction. Everything else should be instant.</p><p>We spent a full sprint just on transition states between list and detail views, and it was worth every hour.</p>'
+  },
+  {
+    id: 3, title: 'A pragmatic guide to code review', tag: 'Career',
+    author: 'Priya Nair', date: 'Jul 10, 2026',
+    body: '<p>Code review is where most engineering culture actually lives, not in the wiki.</p><h2>Our checklist</h2><ul><li>Would I understand this in six months?</li><li>Does the test cover the interesting case?</li><li>Is there a simpler version of this diff?</li></ul><p>None of this is novel. Consistency is what matters.</p>'
+  },
+  {
+    id: 4, title: 'Shipping AI features without the hype', tag: 'AI',
+    author: 'Ada Kim', date: 'Jul 6, 2026',
+    body: '<p>Every roadmap has an AI line item now. The ones that succeed share one trait: they disappear into the workflow.</p><h2>Where it earns its place</h2><p>Summarizing a long post before you commit to reading it. Suggesting a tag. Drafting a first pass you will rewrite anyway.</p><p>We are adding a summarizer to this very blog next — once accounts exist to gate it behind.</p>'
+  },
+  {
+    id: 5, title: 'Our design system, one year later', tag: 'Design',
+    author: 'Marcus Lee', date: 'Jun 29, 2026',
+    body: '<p>A design system is a bet on the future you will not fully understand until you have lived with it.</p><h2>What stuck</h2><p>Spacing tokens and type scale. Nobody argues about those anymore.</p><h2>What we cut</h2><p>Three button variants nobody used, and a color we could never name correctly.</p>'
+  },
+  {
+    id: 6, title: 'Choosing boring technology on purpose', tag: 'Tools',
+    author: 'Priya Nair', date: 'Jun 22, 2026',
+    body: '<p>Boring technology has known failure modes. That is the whole pitch.</p><p>We kept the stack we already understood and spent the saved time on the product instead. Nobody regrets that trade a year later.</p>'
+  }
+];
+
+class Component extends DCLogic {
+  renderVals() {
+    const posts = SEED_POSTS.map(p => ({
+      ...p,
+      initials: initials(p.author),
+      readTime: readTime(p.body),
+      bodyHtml: { __html: p.body },
+    }));
+    return { posts };
+  }
+}
+
+</script>
+</body>
+</html>
