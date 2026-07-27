@@ -1,6 +1,8 @@
 <script setup>
 const {data: posts, error, pending, status, refresh} = await usePosts()
 
+
+
 function initials(author) {
   const name = author || 'anonymous'
   return name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase()
@@ -18,9 +20,12 @@ function formatDate(value) {
 
 <template>
     <div class="page">
-        <header class="brand">
-            <span class="brand-mark"><span class="brand-dot"></span></span>
-            <span class="brand-name">Signal</span>
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark"><span class="brand-dot"></span></span>
+                <span class="brand-name">Signal</span>
+            </div>
+            <NuxtLink to="/new" class="new-post-btn">+ New post</NuxtLink>
         </header>
 
         <h1 class="page-title">Notes on building software</h1>
@@ -55,11 +60,35 @@ function formatDate(value) {
     color: var(--color-text);
 }
 
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
 .brand {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 20px;
+}
+
+.new-post-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.new-post-btn:hover {
+    opacity: 0.9;
 }
 
 .brand-mark {
