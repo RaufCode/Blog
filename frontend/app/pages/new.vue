@@ -1,196 +1,500 @@
 <script setup>
-
 const blog_info = reactive({
-    title: "",
-    author: "",
-    content: "",
+  title: '',
+  author: '',
+  content: '',
 })
 
-// new.vue
+const isSubmitting = ref(false)
+const submitError = ref(false)
+
+const charCount = computed(() => blog_info.content.length)
+const wordCount = computed(() => {
+  return blog_info.content.trim().split(/\s+/).filter(Boolean).length
+})
+const readTime = computed(() => Math.max(1, Math.round(wordCount.value / 200)) + ' min read')
+
 const blog_post = async () => {
+  isSubmitting.value = true
+  submitError.value = false
   try {
     await useCreate(blog_info)
     await navigateTo('/')
   } catch (error) {
-
+    submitError.value = true
+  } finally {
+    isSubmitting.value = false
   }
 }
-
 </script>
 
 <template>
-    <div class="page">
-        <NuxtLink to="/" class="brand">
-            <span class="brand-mark"><span class="brand-dot"></span></span>
-            <span class="brand-name">Signal</span>
-        </NuxtLink>
+  <div class="page">
 
-        <h1 class="page-title">New post</h1>
-        <p class="page-subtitle">Share something you have learned or built.</p>
+    <!-- ── Topbar ── -->
+    <header class="topbar">
+      <NuxtLink to="/" class="brand" aria-label="Back to Signal home">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <rect width="18" height="18" rx="5" fill="var(--accent)"/>
+          <path d="M5 9h8M5 6h5M5 12h6" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="brand-name">Signal</span>
+      </NuxtLink>
 
-        <form class="post-form" @submit.prevent="blog_post">
-            <div class="field">
-                <label for="title">Title</label>
-                <input v-model="blog_info.title" id="title" name="title" type="text" placeholder="Give your post a title" required />
-            </div>
+      <NuxtLink to="/" class="btn-back">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back
+      </NuxtLink>
+    </header>
 
-            <div class="field">
-                <label for="author">Author</label>
-                <input v-model="blog_info.author" id="author" name="author" type="text" placeholder="Your name (optional)" />
-            </div>
-
-            <div class="field">
-                <label for="content">Content</label>
-                <textarea v-model="blog_info.content" id="content" name="content" rows="10" placeholder="Write your post…" required></textarea>
-            </div>
-
-            <div class="form-actions">
-                <NuxtLink to="/" class="btn btn-secondary">Cancel</NuxtLink>
-                <button type="submit" class="btn btn-primary">Publish</button>
-            </div>
-        </form>
+    <!-- ── Page Header ── -->
+    <div class="page-header">
+      <div class="page-header-glow" aria-hidden="true"></div>
+      <div class="page-eyebrow">
+        <span class="eyebrow-dot" aria-hidden="true"></span>
+        New post
+      </div>
+      <h1 class="page-title">Share what you've learned</h1>
+      <p class="page-subtitle">Write your thoughts, document your process, or share an idea worth spreading.</p>
     </div>
+
+    <!-- ── Form ── -->
+    <main class="form-container">
+
+      <!-- Error Banner -->
+      <div v-if="submitError" class="error-banner" role="alert">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 5v3.5M8 11h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        Something went wrong. Please try again.
+      </div>
+
+      <form class="post-form" @submit.prevent="blog_post" novalidate>
+
+        <!-- Title -->
+        <div class="field">
+          <label for="title" class="field-label">Title <span class="required" aria-label="required">*</span></label>
+          <input
+            id="title"
+            v-model="blog_info.title"
+            name="title"
+            type="text"
+            autocomplete="off"
+            placeholder="Give your post a compelling title"
+            required
+            class="field-input"
+            :class="{ 'has-value': blog_info.title }"
+          />
+          <p class="field-hint">A great title is concise, specific, and sparks curiosity.</p>
+        </div>
+
+        <!-- Author -->
+        <div class="field">
+          <label for="author" class="field-label">
+            Author
+            <span class="optional-badge">optional</span>
+          </label>
+          <input
+            id="author"
+            v-model="blog_info.author"
+            name="author"
+            type="text"
+            autocomplete="name"
+            placeholder="Your name"
+            class="field-input"
+            :class="{ 'has-value': blog_info.author }"
+          />
+        </div>
+
+        <!-- Content -->
+        <div class="field">
+          <div class="field-label-row">
+            <label for="content" class="field-label">Content <span class="required" aria-label="required">*</span></label>
+            <div class="content-stats" v-if="blog_info.content">
+              <span>{{ wordCount }} words</span>
+              <span class="stat-sep" aria-hidden="true">·</span>
+              <span>{{ readTime }}</span>
+            </div>
+          </div>
+          <textarea
+            id="content"
+            v-model="blog_info.content"
+            name="content"
+            rows="16"
+            placeholder="Write your post… Start with the most important idea."
+            required
+            class="field-textarea"
+            :class="{ 'has-value': blog_info.content }"
+          ></textarea>
+          <p class="field-hint">Use double line breaks to separate paragraphs.</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <NuxtLink to="/" class="btn-cancel">Discard</NuxtLink>
+          <button
+            type="submit"
+            class="btn-publish"
+            :disabled="isSubmitting || !blog_info.title.trim() || !blog_info.content.trim()"
+            :aria-busy="isSubmitting"
+          >
+            <svg v-if="isSubmitting" class="spinner" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="14" stroke-linecap="round"/>
+            </svg>
+            <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {{ isSubmitting ? 'Publishing…' : 'Publish post' }}
+          </button>
+        </div>
+
+      </form>
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+      <p class="footer-tip">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M6 5.5v3M6 4h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        Your post will be public immediately after publishing.
+      </p>
+    </footer>
+
+  </div>
 </template>
 
 <style scoped>
+/* ── Layout ──────────────────────────────────────────────────── */
 .page {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 56px 24px 96px;
-    font-family: var(--font-sans);
-    color: var(--color-text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  animation: fadeUp var(--duration-slow) var(--ease-out) both;
+}
+
+/* ── Topbar ──────────────────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: var(--nav-h);
+  border-bottom: 1px solid var(--border);
+  background: rgba(13, 13, 16, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 40px;
-    color: inherit;
-    text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  transition: opacity var(--duration-fast);
+}
+.brand:hover { opacity: 0.8; }
+
+.brand-name { color: var(--text-primary); }
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  border-radius: var(--radius-full);
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+}
+.btn-back:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.12);
 }
 
-.brand-mark {
-    width: 26px;
-    height: 26px;
-    border-radius: 7px;
-    background: var(--color-accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+/* ── Page Header ─────────────────────────────────────────────── */
+.page-header {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 64px 24px 52px;
 }
 
-.brand-dot {
-    width: 10px;
-    height: 10px;
-    background: var(--color-accent-contrast);
-    border-radius: 3px;
+.page-header-glow {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(124,92,252,0.15) 0%, transparent 70%);
+  pointer-events: none;
 }
 
-.brand-name {
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -0.02em;
+.page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.eyebrow-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 .page-title {
-    font-family: var(--font-serif);
-    font-size: clamp(26px, 5vw, 34px);
-    font-weight: 600;
-    margin: 0 0 6px 0;
-    letter-spacing: -0.01em;
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 12px;
 }
 
 .page-subtitle {
-    font-size: 15px;
-    color: var(--color-text-muted);
-    margin: 0 0 40px 0;
+  font-size: 15px;
+  color: var(--text-secondary);
+  max-width: 46ch;
+  margin: 0 auto;
+  line-height: 1.65;
 }
 
+/* ── Form Container ──────────────────────────────────────────── */
+.form-container {
+  flex: 1;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+/* ── Error Banner ────────────────────────────────────────────── */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: rgba(240, 96, 96, 0.08);
+  border: 1px solid rgba(240, 96, 96, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 28px;
+}
+
+/* ── Form ────────────────────────────────────────────────────── */
 .post-form {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
 .field {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.field label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-text-muted);
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.field input,
-.field textarea {
-    font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 1.6;
-    padding: 12px 14px;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    background: oklch(1 0 0);
-    color: var(--color-text);
-    resize: none;
+.field-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.field input:focus,
-.field textarea:focus {
-    outline: none;
-    border-color: var(--color-accent);
+.required {
+  color: var(--accent);
 }
 
+.optional-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--text-tertiary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+}
+
+.content-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+.stat-sep {
+  opacity: 0.5;
+}
+
+.field-input,
+.field-textarea {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast);
+  width: 100%;
+  -webkit-appearance: none;
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.field-input:hover,
+.field-textarea:hover {
+  border-color: rgba(255,255,255,0.12);
+}
+
+.field-input:focus,
+.field-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-accent);
+}
+
+.field-textarea {
+  resize: vertical;
+  min-height: 280px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* ── Form Actions ────────────────────────────────────────────── */
 .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
 }
 
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    border: 1px solid transparent;
-    cursor: pointer;
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 22px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+}
+.btn-cancel:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.12);
 }
 
-.btn-primary {
-    background: var(--color-accent);
-    color: var(--color-accent-contrast);
+.btn-publish {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 26px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: background var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast), opacity var(--duration-fast);
+}
+.btn-publish:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+.btn-publish:active:not(:disabled) { transform: translateY(0); }
+.btn-publish:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-.btn-primary:hover {
-    opacity: 0.9;
+/* Spinner animation */
+.spinner {
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
 }
 
-.btn-secondary {
-    background: transparent;
-    color: var(--color-text-muted);
-    border-color: var(--color-border);
+/* ── Footer ──────────────────────────────────────────────────── */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  text-align: center;
 }
 
-@media (max-width: 480px) {
-    .page {
-        padding: 40px 16px 72px;
-    }
+.footer-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
 
-    .form-actions {
-        flex-direction: column-reverse;
-    }
-
-    .btn {
-        width: 100%;
-    }
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .topbar { padding: 0 16px; }
+  .page-header { padding: 48px 16px 40px; }
+  .form-container { padding: 0 16px 48px; }
+  .form-actions { flex-direction: column-reverse; }
+  .btn-cancel,
+  .btn-publish { width: 100%; }
 }
 </style>
