@@ -29,3 +29,11 @@ export function useUpdate(id, blog_info) {
     body: blog_info,
   })
 }
+
+
+export function useSummarize(id) {
+  return $fetch(`/api/${id}/summarize`, {
+    method: 'POST',
+  })
+}
+

@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.schemas.post import PostCreate, PostUpdate, PostRead
 from app.crud import post as post_crud
+from app.services import ai as ai_service
 
 
 router = APIRouter(prefix="/posts", tags=["posts"])
@@ -35,3 +36,14 @@ async def delete_post(post_id: int, db: AsyncSession = Depends(get_db)):
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
     await post_crud.delete_post(db, post)
+
+
+
+@router.post("/{post_id}/summarize")
+async def summarize_post(post_id: int, db: AsyncSession = Depends(get_db)):
+    post = await post_crud.get_post(db, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    summary = await ai_service.summarize_text(post.content)
+    return {"summary": summary}
+    

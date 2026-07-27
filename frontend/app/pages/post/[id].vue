@@ -22,6 +22,23 @@ function startEdit() {
   isEditing.value = true
 }
 
+const summary = ref('')
+const summarizing = ref(false)
+const summarizeError = ref(false)
+
+async function summarize() {
+  summarizing.value = true
+  summarizeError.value = false
+  try {
+    const data = await useSummarize(post.value.id)
+    summary.value = data?.summary || ''
+  } catch (error) {
+    summarizeError.value = true
+  } finally {
+    summarizing.value = false
+  }
+}
+
 const delete_post = async () => {
     if (!confirm('Delete this post? This cannot be undone.')) {
         return
@@ -72,6 +89,7 @@ function paragraphs(content) {
     .map(paragraph => paragraph.trim())
     .filter(Boolean)
 }
+
 </script>
 
 <template>
@@ -82,6 +100,13 @@ function paragraphs(content) {
                 <span class="brand-name">Signal</span>
             </NuxtLink>
             <div v-if="post && !isEditing" class="post-actions">
+                <button type="button" class="btn btn-summarize" :disabled="summarizing" @click="summarize">
+                    <svg class="icon-sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M11 2.5c.18 0 .34.12.39.29l1.06 3.53a4.5 4.5 0 0 0 3.02 3.02l3.53 1.06c.17.05.29.21.29.39s-.12.34-.29.39l-3.53 1.06a4.5 4.5 0 0 0-3.02 3.02l-1.06 3.53a.41.41 0 0 1-.78 0l-1.06-3.53a4.5 4.5 0 0 0-3.02-3.02l-3.53-1.06a.41.41 0 0 1 0-.78l3.53-1.06a4.5 4.5 0 0 0 3.02-3.02l1.06-3.53c.05-.17.21-.29.39-.29Z" fill="currentColor"/>
+                        <path d="M19 2.5c.13 0 .24.08.28.2l.4 1.2a1.9 1.9 0 0 0 1.22 1.22l1.2.4a.3.3 0 0 1 0 .56l-1.2.4a1.9 1.9 0 0 0-1.22 1.22l-.4 1.2a.3.3 0 0 1-.56 0l-.4-1.2a1.9 1.9 0 0 0-1.22-1.22l-1.2-.4a.3.3 0 0 1 0-.56l1.2-.4A1.9 1.9 0 0 0 18.32 3.9l.4-1.2a.3.3 0 0 1 .28-.2Z" fill="currentColor"/>
+                    </svg>
+                    {{ summarizing ? 'Summarizing…' : 'Summarize' }}
+                </button>
                 <button type="button" class="btn btn-secondary" @click="startEdit">Edit</button>
                 <button @click="delete_post" type="button" class="btn btn-danger">Delete</button>
             </div>
@@ -119,6 +144,16 @@ function paragraphs(content) {
                     <span class="date">{{ formatDate(post.created_at) }}</span>
                     <span class="meta-sep">·</span>
                     <span class="read-time">{{ readTime(post.content) }}</span>
+                </div>
+                <p v-if="summarizeError" class="state-message state-message--error">Couldn't summarize this post.</p>
+                <div v-if="summary" class="summary-box">
+                    <div class="summary-label">
+                        <svg class="icon-sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M11 2.5c.18 0 .34.12.39.29l1.06 3.53a4.5 4.5 0 0 0 3.02 3.02l3.53 1.06c.17.05.29.21.29.39s-.12.34-.29.39l-3.53 1.06a4.5 4.5 0 0 0-3.02 3.02l-1.06 3.53a.41.41 0 0 1-.78 0l-1.06-3.53a4.5 4.5 0 0 0-3.02-3.02l-3.53-1.06a.41.41 0 0 1 0-.78l3.53-1.06a4.5 4.5 0 0 0 3.02-3.02l1.06-3.53c.05-.17.21-.29.39-.29Z" fill="currentColor"/>
+                        </svg>
+                        AI Summary
+                    </div>
+                    <p>{{ summary }}</p>
                 </div>
                 <div class="post-body">
                     <p v-for="(paragraph, index) in paragraphs(post.content)" :key="index">{{ paragraph }}</p>
@@ -288,6 +323,56 @@ function paragraphs(content) {
     background: transparent;
     color: var(--color-error);
     border-color: var(--color-border);
+}
+
+.btn-summarize {
+    background: transparent;
+    color: var(--color-accent);
+    border-color: var(--color-border);
+    gap: 6px;
+}
+
+.btn-summarize:hover:not(:disabled) {
+    border-color: var(--color-accent);
+}
+
+.btn-summarize:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.icon-sparkle {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.summary-box {
+    max-width: 68ch;
+    margin: 0 auto 32px;
+    padding: 16px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: color-mix(in oklch, var(--color-accent) 6%, transparent);
+}
+
+.summary-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-accent);
+    margin-bottom: 8px;
+}
+
+.summary-box p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-body);
 }
 
 .edit-form {
