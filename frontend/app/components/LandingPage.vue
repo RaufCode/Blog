@@ -140,12 +140,17 @@ if (import.meta.client) {
       </div>
 
       <!-- Error -->
-      <div v-else-if="error" class="state-error" role="alert">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M10 6v4.5M10 14h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        <span>Couldn't load posts. <button class="inline-link" @click="refresh">Try again</button></span>
+      <div v-else-if="error" class="error-card" role="alert">
+        <div class="error-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="error-content">
+          <span class="error-title">Couldn't load posts</span>
+          <span class="error-message">Something went wrong. <button class="inline-link" @click="refresh">Try again</button></span>
+        </div>
       </div>
 
       <!-- Empty -->
@@ -573,17 +578,59 @@ if (import.meta.client) {
 .skeleton-body.short { width: 60%; }
 
 /* ── Error / Empty States ──────────────────────────────────── */
-.state-error {
+.error-card {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 20px;
-  background: rgba(240, 96, 96, 0.08);
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  background: rgba(240, 96, 96, 0.05);
   border: 1px solid rgba(240, 96, 96, 0.2);
   border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(240, 96, 96, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+  animation: error-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+.error-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  background: var(--color-error);
+  box-shadow: 0 0 12px var(--color-error);
+}
+.error-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(240, 96, 96, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-error);
+  flex-shrink: 0;
+}
+.error-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.error-title {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
+  color: var(--color-error);
+}
+.error-message {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+@keyframes error-shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
 }
 
 .inline-link {

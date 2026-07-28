@@ -145,14 +145,16 @@ if (import.meta.client) {
     </div>
 
     <!-- Error -->
-    <div v-else-if="error" class="state-error" role="alert">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-      <div>
-        <p class="state-error-title">Couldn't load this post</p>
-        <NuxtLink to="/" class="state-link">← Go back home</NuxtLink>
+    <div v-else-if="error" class="error-card full-page-error" role="alert">
+      <div class="error-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="error-content">
+        <span class="error-title">Couldn't load this post</span>
+        <span class="error-message">The post you're looking for might have been removed or is temporarily unavailable. <br><br> <NuxtLink to="/" class="inline-link">← Go back home</NuxtLink></span>
       </div>
     </div>
 
@@ -208,9 +210,17 @@ if (import.meta.client) {
         <div class="article-divider" aria-hidden="true"></div>
 
         <!-- Summarize error -->
-        <div v-if="summarizeError" class="alert-error" role="alert">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Couldn't generate a summary. Please try again.
+        <div v-if="summarizeError" class="error-card" role="alert">
+          <div class="error-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="error-content">
+            <span class="error-title">Summary Failed</span>
+            <span class="error-message">Couldn't generate a summary. Please try again.</span>
+          </div>
         </div>
 
         <!-- AI Summary -->
@@ -334,11 +344,67 @@ if (import.meta.client) {
 .sk-line { height: 14px; width: 100%; }
 .sk-line.short { width: 65%; }
 
-/* Error */
-.state-error { max-width: 720px; margin: 80px auto; padding: 0 24px; display: flex; align-items: flex-start; gap: 16px; color: var(--color-error); }
-.state-error-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
-.state-link { font-size: 14px; font-weight: 600; color: var(--accent); transition: opacity var(--duration-fast); }
-.state-link:hover { opacity: 0.8; }
+/* ── Error Card ── */
+.error-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  background: rgba(240, 96, 96, 0.05);
+  border: 1px solid rgba(240, 96, 96, 0.2);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(240, 96, 96, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+  animation: error-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+.full-page-error { max-width: 720px; margin: 80px auto; }
+.error-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  background: var(--color-error);
+  box-shadow: 0 0 12px var(--color-error);
+}
+.error-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(240, 96, 96, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-error);
+  flex-shrink: 0;
+}
+.error-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.error-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-error);
+}
+.error-message {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.inline-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+}
+@keyframes error-shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
+}
 
 /* Article */
 .article-container { flex: 1; max-width: 720px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; }
@@ -368,8 +434,7 @@ if (import.meta.client) {
 .summary-header { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; background: linear-gradient(135deg, #a78bfa, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 12px; }
 .summary-text { font-size: 15.5px; line-height: 1.75; color: var(--text-primary); text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
 
-/* Alerts */
-.alert-error { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: rgba(240,96,96,0.08); border: 1px solid rgba(240,96,96,0.2); border-radius: var(--radius-md); color: var(--color-error); font-size: 13px; font-weight: 500; margin-bottom: 24px; }
+
 
 /* Article body */
 .article-body { font-family: var(--font-serif); font-size: 19px; line-height: 1.85; color: var(--text-secondary); }
