@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
-from app.routers import post
+from app.routers import post, user
 
 
 @asynccontextmanager
@@ -32,9 +32,14 @@ app.add_middleware(
     allow_credentials=True,
 )
 
-app.include_router(post.router)
 
 
 @app.get("/")
 async def root():
     return {"message": "Blog API is running"}
+
+
+app.include_router(user.router)
+app.include_router(post.router)
+
+
