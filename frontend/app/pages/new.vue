@@ -37,20 +37,22 @@ const blog_post = async () => {
 
     <!-- ── Topbar ── -->
     <header class="topbar">
-      <NuxtLink to="/" class="brand" aria-label="Back to Signal home">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-          <rect width="18" height="18" rx="5" fill="var(--accent)"/>
-          <path d="M5 9h8M5 6h5M5 12h6" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-        <span class="brand-name">Signal</span>
-      </NuxtLink>
+      <div class="topbar-inner">
+        <NuxtLink to="/" class="brand" aria-label="Back to Signal home">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <rect width="18" height="18" rx="5" fill="var(--accent)"/>
+            <path d="M5 9h8M5 6h5M5 12h6" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <span class="brand-name">Signal</span>
+        </NuxtLink>
 
-      <NuxtLink to="/" class="btn-back">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-          <path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Back
-      </NuxtLink>
+        <NuxtLink to="/" class="btn-back">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back
+        </NuxtLink>
+      </div>
     </header>
 
     <!-- ── Page Header ── -->
@@ -183,10 +185,6 @@ const blog_post = async () => {
 
 /* ── Topbar ──────────────────────────────────────────────────── */
 .topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
   height: var(--nav-h);
   border-bottom: 1px solid var(--border);
   background: rgba(13, 13, 16, 0.85);
@@ -195,6 +193,16 @@ const blog_post = async () => {
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+.topbar-inner {
+  max-width: var(--max-w-wide);
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .brand {
@@ -404,7 +412,7 @@ const blog_post = async () => {
 }
 
 .field-textarea {
-  resize: vertical;
+  resize: none;
   min-height: 280px;
   font-size: 15px;
   line-height: 1.8;

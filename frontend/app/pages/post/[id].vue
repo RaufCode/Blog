@@ -215,13 +215,22 @@ if (import.meta.client) {
 
         <!-- AI Summary -->
         <div v-if="summary" class="summary-card">
-          <div class="summary-header">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M11 2.5c.18 0 .34.12.39.29l1.06 3.53a4.5 4.5 0 0 0 3.02 3.02l3.53 1.06c.17.05.29.21.29.39s-.12.34-.29.39l-3.53 1.06a4.5 4.5 0 0 0-3.02 3.02l-1.06 3.53a.41.41 0 0 1-.78 0l-1.06-3.53a4.5 4.5 0 0 0-3.02-3.02l-3.53-1.06a.41.41 0 0 1 0-.78l3.53-1.06a4.5 4.5 0 0 0 3.02-3.02l1.06-3.53c.05-.17.21-.29.39-.29Z" fill="currentColor"/>
-            </svg>
-            AI Summary
+          <div class="summary-card-glow"></div>
+          <div class="summary-card-content">
+            <div class="summary-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M11 2.5c.18 0 .34.12.39.29l1.06 3.53a4.5 4.5 0 0 0 3.02 3.02l3.53 1.06c.17.05.29.21.29.39s-.12.34-.29.39l-3.53 1.06a4.5 4.5 0 0 0-3.02 3.02l-1.06 3.53a.41.41 0 0 1-.78 0l-1.06-3.53a4.5 4.5 0 0 0-3.02-3.02l-3.53-1.06a.41.41 0 0 1 0-.78l3.53-1.06a4.5 4.5 0 0 0 3.02-3.02l1.06-3.53c.05-.17.21-.29.39-.29Z" fill="url(#summary-grad)"/>
+                <defs>
+                  <linearGradient id="summary-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#7c5cfc" />
+                    <stop offset="1" stop-color="#a78bfa" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              AI Executive Summary
+            </div>
+            <p class="summary-text">{{ summary }}</p>
           </div>
-          <p class="summary-text">{{ summary }}</p>
         </div>
 
         <!-- Body -->
@@ -287,7 +296,7 @@ if (import.meta.client) {
 /* Navbar */
 .nav { position: sticky; top: 0; z-index: 100; height: var(--nav-h); border-bottom: 1px solid transparent; transition: background var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out); }
 .nav--scrolled { background: rgba(13,13,16,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-color: var(--border); box-shadow: 0 1px 24px rgba(0,0,0,0.4); }
-.nav-inner { max-width: 860px; margin: 0 auto; padding: 0 24px; height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.nav-inner { max-width: var(--max-w-wide); margin: 0 auto; padding: 0 24px; height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 
 .brand { display: inline-flex; align-items: center; gap: 9px; font-weight: 800; font-size: 16px; letter-spacing: -0.03em; color: var(--text-primary); transition: opacity var(--duration-fast); }
 .brand:hover { opacity: 0.8; }
@@ -350,9 +359,14 @@ if (import.meta.client) {
 .article-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent); margin-bottom: 36px; }
 
 /* AI Summary */
-.summary-card { margin-bottom: 36px; padding: 20px 22px; border-radius: var(--radius-lg); background: var(--accent-subtle); border: 1px solid rgba(124,92,252,0.25); }
-.summary-header { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 10px; }
-.summary-text { font-size: 15px; line-height: 1.7; color: var(--text-secondary); }
+.summary-card { position: relative; margin-bottom: 40px; border-radius: var(--radius-lg); background: var(--bg-surface); border: 1px solid transparent; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1; }
+.summary-card::before { content: ""; position: absolute; inset: -1px; border-radius: calc(var(--radius-lg) + 1px); background: linear-gradient(135deg, rgba(124,92,252,0.5), rgba(167,139,250,0.2), rgba(124,92,252,0.1)); z-index: -1; pointer-events: none; }
+.summary-card-glow { position: absolute; inset: 0; border-radius: var(--radius-lg); background: radial-gradient(circle at top left, rgba(124,92,252,0.15) 0%, transparent 60%); z-index: 0; pointer-events: none; overflow: hidden; }
+.summary-card-glow::after { content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: summary-shimmer 4s ease-in-out infinite; }
+@keyframes summary-shimmer { 0% { left: -100%; } 50%, 100% { left: 200%; } }
+.summary-card-content { position: relative; z-index: 1; padding: 24px 28px; }
+.summary-header { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; background: linear-gradient(135deg, #a78bfa, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 12px; }
+.summary-text { font-size: 15.5px; line-height: 1.75; color: var(--text-primary); text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
 
 /* Alerts */
 .alert-error { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: rgba(240,96,96,0.08); border: 1px solid rgba(240,96,96,0.2); border-radius: var(--radius-md); color: var(--color-error); font-size: 13px; font-weight: 500; margin-bottom: 24px; }
@@ -381,7 +395,7 @@ if (import.meta.client) {
 .field-input, .field-textarea { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; padding: 13px 16px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast); width: 100%; }
 .field-input::placeholder, .field-textarea::placeholder { color: var(--text-tertiary); }
 .field-input:focus, .field-textarea:focus { outline: none; border-color: var(--accent); background: var(--bg-elevated); box-shadow: var(--shadow-accent); }
-.field-textarea { resize: vertical; min-height: 300px; }
+.field-textarea { resize: none; min-height: 300px; }
 .form-actions { display: flex; justify-content: flex-end; gap: 12px; padding-top: 8px; }
 
 /* Delete Modal */
