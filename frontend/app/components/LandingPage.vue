@@ -1,5 +1,18 @@
 <script setup>
 const { data: posts, error, pending, refresh } = await usePosts()
+const { user, isAuthenticated, logout } = useAuth()
+
+const isAccountMenuOpen = ref(false)
+
+function initialsFor(firstName, lastName) {
+  return `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`.toUpperCase() || '?'
+}
+
+async function handleLogout() {
+  isAccountMenuOpen.value = false
+  await logout()
+  await navigateTo('/')
+}
 
 function initials(author) {
   const name = author || 'anonymous'
@@ -53,6 +66,30 @@ if (import.meta.client) {
             </svg>
             Write
           </NuxtLink>
+
+          <template v-if="isAuthenticated">
+            <div class="account-menu">
+              <button
+                class="account-trigger"
+                type="button"
+                @click="isAccountMenuOpen = !isAccountMenuOpen"
+                :aria-expanded="isAccountMenuOpen"
+              >
+                <span class="account-avatar" aria-hidden="true">
+                  {{ initialsFor(user.first_name, user.last_name) }}
+                </span>
+              </button>
+
+              <div v-if="isAccountMenuOpen" class="account-dropdown" @mouseleave="isAccountMenuOpen = false">
+                <p class="account-name">{{ user.first_name }} {{ user.last_name }}</p>
+                <p class="account-email">{{ user.email }}</p>
+                <button class="account-logout" type="button" @click="handleLogout">Sign out</button>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <NuxtLink to="/login" class="btn-nav-ghost">Sign in</NuxtLink>
+          </template>
         </nav>
       </div>
     </header>
@@ -267,6 +304,104 @@ if (import.meta.client) {
   box-shadow: 0 4px 16px var(--accent-glow);
 }
 .btn-nav:active { transform: translateY(0); }
+
+.btn-nav-ghost {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+}
+.btn-nav-ghost:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.account-menu {
+  position: relative;
+}
+
+.account-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.account-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow var(--duration-fast);
+}
+.account-trigger:hover .account-avatar,
+.account-trigger[aria-expanded="true"] .account-avatar {
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 200px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-md);
+  z-index: 110;
+  animation: fadeUp var(--duration-fast) var(--ease-out) both;
+}
+
+.account-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.account-email {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-logout {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  margin: 0 -10px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-error);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+.account-logout:hover {
+  background: rgba(240, 96, 96, 0.1);
+}
 
 /* ── Hero ──────────────────────────────────────────────────── */
 .hero {

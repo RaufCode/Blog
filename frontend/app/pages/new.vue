@@ -1,7 +1,11 @@
 <script setup>
+definePageMeta({ middleware: 'auth' })
+
+const { user } = useAuth()
+
 const blog_info = reactive({
   title: '',
-  author: '',
+  author: `${user.value?.first_name ?? ''} ${user.value?.last_name ?? ''}`.trim(),
   content: '',
 })
 

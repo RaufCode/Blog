@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.schemas.user import UserCreate, UserLogin, UserUpdate, UserRead, Token
 from app.crud import user as user_crud
-from app.security import create_access_token
+from app.security import create_access_token, verify_password
 
 router = APIRouter(
     prefix="/users",
@@ -27,14 +27,18 @@ async def login(
 ):
     user = await user_crud.login_user(db, data)
 
-    # TODO(rauf): swap this for a pwdlib hash verification once you wire up hashing
-    if not user or user.password != data.password:
+    if not user or not verify_password(data.password, user.password):
         raise HTTPException(
             status_code=401,
             detail="Invalid email or password",
         )
 
-    access_token = create_access_token({"sub": str(user.id)})
+    access_token = create_access_token({
+        "sub": str(user.id),
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+    })
     return Token(access_token=access_token)
 
 

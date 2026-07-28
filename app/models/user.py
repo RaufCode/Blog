@@ -14,7 +14,11 @@ class User(Base):
         nullable=False
         )
     last_name: Mapped[str] = mapped_column(
-        String(50), 
+        String(50),
+        nullable=True
+        )
+    middle_name: Mapped[str | None] = mapped_column(
+        String(50),
         nullable=True
         )
     email: Mapped[str] = mapped_column(
