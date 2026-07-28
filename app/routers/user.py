@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.dependencies import get_current_user
+from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin, UserUpdate, UserRead, Token
 from app.crud import user as user_crud
 from app.security import create_access_token, verify_password
@@ -46,6 +48,7 @@ async def login(
 async def read_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     user = await user_crud.get_user(db, user_id)
 
@@ -61,6 +64,7 @@ async def read_user(
 @router.get("/", response_model=list[UserRead])
 async def read_users(
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     return await user_crud.get_users(db)
 
@@ -70,7 +74,14 @@ async def update_user(
     user_id: int,
     data: UserUpdate,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="You can only update your own account",
+        )
+
     user = await user_crud.get_user(db, user_id)
 
     if not user:
@@ -86,7 +97,14 @@ async def update_user(
 async def delete_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="You can only delete your own account",
+        )
+
     user = await user_crud.get_user(db, user_id)
 
     if not user:

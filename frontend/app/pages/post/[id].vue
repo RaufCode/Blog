@@ -7,11 +7,13 @@ definePageMeta({
 
 const route = useRoute()
 const { data: post, pending, error } = await usePost(route.params.id)
+const { isAuthenticated } = useAuth()
 
 const isEditing = ref(false)
 const editForm = reactive({ title: '', author: '', content: '' })
 
 function startEdit() {
+  if (!isAuthenticated.value) return
   editForm.title = post.value.title
   editForm.author = post.value.author || ''
   editForm.content = post.value.content
@@ -50,6 +52,7 @@ async function summarize() {
 const showDeleteConfirm = ref(false)
 const deleting = ref(false)
 async function confirmDelete() {
+  if (!isAuthenticated.value) return
   deleting.value = true
   try {
     await useDelete(post.value.id)
@@ -103,18 +106,23 @@ if (import.meta.client) {
             {{ summarizing ? 'Summarizing…' : 'AI Summary' }}
             <span v-if="summarizing" class="spinner-dot"></span>
           </button>
-          <button class="btn btn-edit" @click="startEdit">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-            </svg>
-            Edit
-          </button>
-          <button class="btn btn-danger" @click="showDeleteConfirm = true">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path d="M2 4h10M5 4V2.5h4V4M5.5 6.5v4M8.5 6.5v4M3 4l.8 7.5h6.4L11 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Delete
-          </button>
+          <template v-if="isAuthenticated">
+            <button class="btn btn-edit" @click="startEdit">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+              </svg>
+              Edit
+            </button>
+            <button class="btn btn-danger" @click="showDeleteConfirm = true">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M2 4h10M5 4V2.5h4V4M5.5 6.5v4M8.5 6.5v4M3 4l.8 7.5h6.4L11 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Delete
+            </button>
+          </template>
+          <NuxtLink v-else :to="`/login?redirect=/post/${post.id}`" class="btn btn-edit">
+            Sign in to edit
+          </NuxtLink>
         </div>
 
         <div v-if="isEditing" class="edit-actions">
