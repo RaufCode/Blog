@@ -1,11 +1,8 @@
 <script setup>
 definePageMeta({ middleware: 'auth' })
 
-const { user } = useAuth()
-
 const blog_info = reactive({
   title: '',
-  author: `${user.value?.first_name ?? ''} ${user.value?.last_name ?? ''}`.trim(),
   content: '',
 })
 
@@ -100,24 +97,6 @@ const blog_post = async () => {
             :class="{ 'has-value': blog_info.title }"
           />
           <p class="field-hint">A great title is concise, specific, and sparks curiosity.</p>
-        </div>
-
-        <!-- Author -->
-        <div class="field">
-          <label for="author" class="field-label">
-            Author
-            <span class="optional-badge">optional</span>
-          </label>
-          <input
-            id="author"
-            v-model="blog_info.author"
-            name="author"
-            type="text"
-            autocomplete="name"
-            placeholder="Your name"
-            class="field-input"
-            :class="{ 'has-value': blog_info.author }"
-          />
         </div>
 
         <!-- Content -->
@@ -397,18 +376,6 @@ const blog_post = async () => {
 
 .required {
   color: var(--accent);
-}
-
-.optional-badge {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: 0.02em;
-  color: var(--text-tertiary);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  padding: 2px 7px;
-  border-radius: var(--radius-full);
 }
 
 .content-stats {
