@@ -30,17 +30,30 @@ async def read_post(db: AsyncSession = Depends(get_db)):
     return await post_crud.get_posts(db)
 
 @router.put("/{post_id}", response_model=PostRead)
-async def update_post(post_id: int, data: PostUpdate, db: AsyncSession = Depends(get_db)):
+async def update_post(
+    post_id: int,
+    data: PostUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     post = await post_crud.get_post(db, post_id)
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
+    if post.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only edit your own posts")
     return await post_crud.update_post(db, post, data)
 
 @router.delete("/{post_id}", status_code=204)
-async def delete_post(post_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_post(
+    post_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     post = await post_crud.get_post(db, post_id)
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
+    if post.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only delete your own posts")
     await post_crud.delete_post(db, post)
 
 
