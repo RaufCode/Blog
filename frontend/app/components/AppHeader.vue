@@ -39,11 +39,16 @@ if (import.meta.client) {
       <nav class="nav-links" aria-label="Site navigation">
         <slot name="actions" />
 
-        <NuxtLink v-if="showWriteLink" to="/new" class="btn-nav">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <NuxtLink
+          v-if="showWriteLink"
+          to="/new"
+          class="icon-btn icon-btn-accent"
+          title="Write a new post"
+          aria-label="Write a new post"
+        >
+          <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
-          Write
         </NuxtLink>
 
         <template v-if="isAuthenticated">
@@ -131,26 +136,40 @@ if (import.meta.client) {
   gap: 12px;
 }
 
-.btn-nav {
+.icon-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: var(--accent);
-  color: var(--accent-contrast);
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: var(--radius-full);
-  transition: background var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast);
 }
-.btn-nav:hover {
+.icon-btn:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.12);
+}
+.icon-btn:active { transform: translateY(0); }
+
+.icon-btn-accent {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-contrast);
+}
+.icon-btn-accent:hover {
   background: var(--accent-hover);
+  color: var(--accent-contrast);
+  border-color: transparent;
   transform: translateY(-1px);
   box-shadow: 0 4px 16px var(--accent-glow);
 }
-.btn-nav:active { transform: translateY(0); }
+.icon-btn-accent:active { transform: translateY(0); }
 
 .btn-nav-ghost {
   display: inline-flex;
