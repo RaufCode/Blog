@@ -7,11 +7,12 @@ export default defineEventHandler(async (event) => {
         return await $fetch(`${config.backendUrl}/posts/${id}`, {
             method: 'PUT',
             body,
+            headers: authHeaders(event),
         })
     } catch (error) {
         throw createError({
             statusCode: error?.statusCode ?? 500,
-            statusMessage: "Unable to update post"
+            statusMessage: error?.data?.detail ?? "Unable to update post"
         })
     }
 })
