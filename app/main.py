@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
-from app.routers import post, user
+from app.routers import post, user, comment
 
 
 @asynccontextmanager
@@ -41,5 +41,6 @@ async def root():
 
 app.include_router(user.router)
 app.include_router(post.router)
+app.include_router(comment.router)
 
 
