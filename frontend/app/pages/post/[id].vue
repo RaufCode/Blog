@@ -154,7 +154,7 @@ if (import.meta.client) {
             {{ summarizing ? 'Summarizing…' : 'AI Summary' }}
             <span v-if="summarizing" class="spinner-dot"></span>
           </button>
-          <template v-if="isAuthenticated">
+          <template v-if="isOwner">
             <button class="btn btn-edit" @click="startEdit">
               <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
@@ -168,7 +168,7 @@ if (import.meta.client) {
               Delete
             </button>
           </template>
-          <NuxtLink v-else :to="`/login?redirect=/post/${post.id}`" class="btn btn-edit">
+          <NuxtLink v-else-if="!isAuthenticated" :to="`/login?redirect=/post/${post.id}`" class="btn btn-edit">
             Sign in to edit
           </NuxtLink>
         </div>
