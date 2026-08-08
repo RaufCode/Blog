@@ -7,13 +7,21 @@ definePageMeta({
 
 const route = useRoute()
 const { data: post, pending, error } = await usePost(route.params.id)
-const { isAuthenticated } = useAuth()
+const { data: comments } = await useComments(route.params.id)
+const { isAuthenticated, user } = useAuth()
+
+const isOwner = computed(() =>
+  isAuthenticated.value &&
+  !!post.value &&
+  post.value.user_id != null &&
+  String(post.value.user_id) === String(user.value?.sub)
+)
 
 const isEditing = ref(false)
 const editForm = reactive({ title: '', author: '', content: '' })
 
 function startEdit() {
-  if (!isAuthenticated.value) return
+  if (!isOwner.value) return
   editForm.title = post.value.title
   editForm.author = post.value.author || ''
   editForm.content = post.value.content
@@ -52,7 +60,7 @@ async function summarize() {
 const showDeleteConfirm = ref(false)
 const deleting = ref(false)
 async function confirmDelete() {
-  if (!isAuthenticated.value) return
+  if (!isOwner.value) return
   deleting.value = true
   try {
     await useDelete(post.value.id)
@@ -61,6 +69,46 @@ async function confirmDelete() {
     deleting.value = false
     showDeleteConfirm.value = false
   }
+}
+
+const newComment = ref('')
+const postingComment = ref(false)
+const commentError = ref(false)
+async function submitComment() {
+  if (!newComment.value.trim()) return
+  postingComment.value = true
+  commentError.value = false
+  try {
+    const created = await usePostComment(post.value.id, newComment.value.trim())
+    comments.value = [...(comments.value || []), created]
+    newComment.value = ''
+  } catch {
+    commentError.value = true
+  } finally {
+    postingComment.value = false
+  }
+}
+
+const deletingCommentId = ref(null)
+async function removeComment(commentId) {
+  deletingCommentId.value = commentId
+  try {
+    await useDeleteComment(post.value.id, commentId)
+    comments.value = (comments.value || []).filter((c) => c.id !== commentId)
+  } catch {
+    // leave the comment in place if deletion failed
+  } finally {
+    deletingCommentId.value = null
+  }
+}
+
+function commentAuthorName(comment) {
+  return `${comment.author.first_name} ${comment.author.last_name}`.trim()
+}
+function canDeleteComment(comment) {
+  if (!isAuthenticated.value) return false
+  if (isOwner.value) return true
+  return String(comment.author.id) === String(user.value?.sub)
 }
 
 function initials(author) {
