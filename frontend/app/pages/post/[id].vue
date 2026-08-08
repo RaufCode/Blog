@@ -139,20 +139,18 @@ function paragraphs(content) {
             {{ summarizing ? 'Summarizing…' : 'AI Summary' }}
             <span v-if="summarizing" class="spinner-dot"></span>
           </button>
-          <template v-if="isOwner">
-            <button class="btn btn-edit" @click="startEdit">
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <div v-if="isOwner" class="owner-actions">
+            <button class="icon-btn" title="Edit post" aria-label="Edit post" @click="startEdit">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
               </svg>
-              Edit
             </button>
-            <button class="btn btn-danger" @click="showDeleteConfirm = true">
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <button class="icon-btn icon-btn-danger" title="Delete post" aria-label="Delete post" @click="showDeleteConfirm = true">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M2 4h10M5 4V2.5h4V4M5.5 6.5v4M8.5 6.5v4M3 4l.8 7.5h6.4L11 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              Delete
             </button>
-          </template>
+          </div>
           <NuxtLink v-else-if="!isAuthenticated" :to="`/login?redirect=/post/${post.id}`" class="btn btn-edit">
             Sign in to edit
           </NuxtLink>
@@ -411,8 +409,27 @@ function paragraphs(content) {
 
 .btn-edit:hover { color: var(--text-primary); }
 
-.btn-danger { color: var(--color-error); border-color: rgba(240,96,96,0.25); }
-.btn-danger:hover { background: rgba(240,96,96,0.1); border-color: var(--color-error); color: var(--color-error); }
+.owner-actions { display: flex; align-items: center; gap: 6px; }
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast);
+}
+.icon-btn:hover { background: var(--bg-overlay); color: var(--text-primary); border-color: rgba(255,255,255,0.12); }
+.icon-btn:active { transform: translateY(0); }
+
+.icon-btn-danger { color: var(--color-error); border-color: rgba(240,96,96,0.25); }
+.icon-btn-danger:hover { background: rgba(240,96,96,0.1); border-color: var(--color-error); color: var(--color-error); }
 
 .btn-save { background: var(--accent); color: white; border-color: transparent; }
 .btn-save:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 16px var(--accent-glow); border-color: transparent; }
