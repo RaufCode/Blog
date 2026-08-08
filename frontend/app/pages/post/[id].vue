@@ -123,27 +123,14 @@ function formatDate(value) {
 function paragraphs(content) {
   return (content || '').split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
 }
-
-const scrolled = ref(false)
-if (import.meta.client) {
-  window.addEventListener('scroll', () => { scrolled.value = window.scrollY > 20 }, { passive: true })
-}
 </script>
 
 <template>
   <div class="page">
 
     <!-- Navbar -->
-    <header class="nav" :class="{ 'nav--scrolled': scrolled }">
-      <div class="nav-inner">
-        <NuxtLink to="/" class="brand">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-            <rect width="18" height="18" rx="5" fill="var(--accent)"/>
-            <path d="M5 9h8M5 6h5M5 12h6" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-          <span>Signal</span>
-        </NuxtLink>
-
+    <AppHeader>
+      <template #actions>
         <div v-if="post && !isEditing" class="post-actions">
           <button class="btn btn-summarize" :disabled="summarizing" @click="summarize">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -175,8 +162,8 @@ if (import.meta.client) {
           <button class="btn btn-cancel-edit" @click="cancelEdit">Cancel</button>
           <button class="btn btn-save" type="button" @click="saveEdit">Save changes</button>
         </div>
-      </div>
-    </header>
+      </template>
+    </AppHeader>
 
     <!-- Loading -->
     <div v-if="pending" class="state-loading" aria-busy="true" aria-label="Loading post">
@@ -412,14 +399,6 @@ if (import.meta.client) {
 <style scoped>
 .page { min-height: 100vh; display: flex; flex-direction: column; animation: fadeUp var(--duration-slow) var(--ease-out) both; }
 
-/* Navbar */
-.nav { position: sticky; top: 0; z-index: 100; height: var(--nav-h); border-bottom: 1px solid transparent; transition: background var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out); }
-.nav--scrolled { background: rgba(13,13,16,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-color: var(--border); box-shadow: 0 1px 24px rgba(0,0,0,0.4); }
-.nav-inner { max-width: var(--max-w-wide); margin: 0 auto; padding: 0 24px; height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-
-.brand { display: inline-flex; align-items: center; gap: 9px; font-weight: 800; font-size: 16px; letter-spacing: -0.03em; color: var(--text-primary); transition: opacity var(--duration-fast); }
-.brand:hover { opacity: 0.8; }
-
 .post-actions, .edit-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 /* Buttons */
@@ -613,7 +592,6 @@ if (import.meta.client) {
 .btn-modal-delete:disabled { opacity: 0.5; cursor: not-allowed; }
 
 @media (max-width: 640px) {
-  .nav-inner { padding: 0 16px; }
   .post-actions { gap: 6px; }
   .btn { padding: 6px 10px; font-size: 12px; }
   .article-container, .edit-container { padding: 32px 16px 64px; }
