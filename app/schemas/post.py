@@ -21,4 +21,5 @@ class PostRead(BaseModel):
     title: str
     content: str
     author: str | None = None
+    user_id: int | None = None
     created_at: datetime
