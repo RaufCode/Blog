@@ -33,24 +33,7 @@ const blog_post = async () => {
   <div class="page">
 
     <!-- ── Topbar ── -->
-    <header class="topbar">
-      <div class="topbar-inner">
-        <NuxtLink to="/" class="brand" aria-label="Back to Signal home">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-            <rect width="18" height="18" rx="5" fill="var(--accent)"/>
-            <path d="M5 9h8M5 6h5M5 12h6" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-          <span class="brand-name">Signal</span>
-        </NuxtLink>
-
-        <NuxtLink to="/" class="btn-back">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Back
-        </NuxtLink>
-      </div>
-    </header>
+    <AppHeader />
 
     <!-- ── Page Header ── -->
     <div class="page-header">
@@ -165,61 +148,6 @@ const blog_post = async () => {
   display: flex;
   flex-direction: column;
   animation: fadeUp var(--duration-slow) var(--ease-out) both;
-}
-
-/* ── Topbar ──────────────────────────────────────────────────── */
-.topbar {
-  height: var(--nav-h);
-  border-bottom: 1px solid var(--border);
-  background: rgba(13, 13, 16, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.topbar-inner {
-  max-width: var(--max-w-wide);
-  margin: 0 auto;
-  padding: 0 24px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-  transition: opacity var(--duration-fast);
-}
-.brand:hover { opacity: 0.8; }
-
-.brand-name { color: var(--text-primary); }
-
-.btn-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  padding: 7px 14px;
-  border-radius: var(--radius-full);
-  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
-}
-.btn-back:hover {
-  background: var(--bg-overlay);
-  color: var(--text-primary);
-  border-color: rgba(255,255,255,0.12);
 }
 
 /* ── Page Header ─────────────────────────────────────────────── */
@@ -515,7 +443,6 @@ const blog_post = async () => {
 
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .topbar { padding: 0 16px; }
   .page-header { padding: 48px 16px 40px; }
   .form-container { padding: 0 16px 48px; }
   .form-actions { flex-direction: column-reverse; }
