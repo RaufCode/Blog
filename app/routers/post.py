@@ -11,8 +11,12 @@ from app.services import ai as ai_service
 router = APIRouter(prefix="/posts", tags=["posts"])
 
 @router.post("/", response_model=PostRead)
-async def create_post(data: PostCreate, db: AsyncSession = Depends(get_db)):
-    return await post_crud.create_post(db, data)
+async def create_post(
+    data: PostCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return await post_crud.create_post(db, data, current_user.id)
 
 @router.get("/{post_id}", response_model=PostRead)
 async def read_post(post_id: int, db: AsyncSession = Depends(get_db)):
