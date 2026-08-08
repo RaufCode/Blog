@@ -18,12 +18,11 @@ const isOwner = computed(() =>
 )
 
 const isEditing = ref(false)
-const editForm = reactive({ title: '', author: '', content: '' })
+const editForm = reactive({ title: '', content: '' })
 
 function startEdit() {
   if (!isOwner.value) return
   editForm.title = post.value.title
-  editForm.author = post.value.author || ''
   editForm.content = post.value.content
   isEditing.value = true
 }
@@ -33,7 +32,6 @@ async function saveEdit() {
   try {
     const { data } = await useUpdate(post.value.id, {
       title: editForm.title,
-      author: editForm.author,
       content: editForm.content,
     })
     post.value = data.value
@@ -216,10 +214,6 @@ if (import.meta.client) {
           <div class="field">
             <label for="edit-title" class="field-label">Title</label>
             <input id="edit-title" v-model="editForm.title" type="text" required class="field-input"/>
-          </div>
-          <div class="field">
-            <label for="edit-author" class="field-label">Author <span class="optional">optional</span></label>
-            <input id="edit-author" v-model="editForm.author" type="text" class="field-input"/>
           </div>
           <div class="field">
             <label for="edit-content" class="field-label">Content</label>
@@ -599,7 +593,6 @@ if (import.meta.client) {
 .edit-form { display: flex; flex-direction: column; gap: 24px; }
 .field { display: flex; flex-direction: column; gap: 8px; }
 .field-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); display: flex; align-items: center; gap: 6px; }
-.optional { font-size: 10px; font-weight: 600; text-transform: none; background: var(--bg-elevated); border: 1px solid var(--border); padding: 2px 7px; border-radius: var(--radius-full); }
 .field-input, .field-textarea { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; padding: 13px 16px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast); width: 100%; }
 .field-input::placeholder, .field-textarea::placeholder { color: var(--text-tertiary); }
 .field-input:focus, .field-textarea:focus { outline: none; border-color: var(--accent); background: var(--bg-elevated); box-shadow: var(--shadow-accent); }
