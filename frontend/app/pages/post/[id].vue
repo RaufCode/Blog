@@ -296,6 +296,73 @@ if (import.meta.client) {
           <p v-for="(para, i) in paragraphs(post.content)" :key="i">{{ para }}</p>
         </article>
 
+        <!-- Comments -->
+        <section class="comments-section" aria-labelledby="comments-heading">
+          <div class="comments-header">
+            <h2 id="comments-heading" class="comments-title">Comments</h2>
+            <span class="comments-count">{{ comments?.length || 0 }}</span>
+          </div>
+
+          <div v-if="commentError" class="error-card" role="alert">
+            <div class="error-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="error-content">
+              <span class="error-title">Comment Failed</span>
+              <span class="error-message">Couldn't post your comment. Please try again.</span>
+            </div>
+          </div>
+
+          <form v-if="isAuthenticated" class="comment-form" @submit.prevent="submitComment">
+            <textarea
+              v-model="newComment"
+              class="comment-textarea"
+              rows="3"
+              placeholder="Share your thoughts…"
+              required
+            ></textarea>
+            <div class="comment-form-actions">
+              <button type="submit" class="btn btn-save" :disabled="postingComment || !newComment.trim()">
+                {{ postingComment ? 'Posting…' : 'Post comment' }}
+              </button>
+            </div>
+          </form>
+          <div v-else class="comment-signin-card">
+            <span>Sign in to join the conversation.</span>
+            <NuxtLink :to="`/login?redirect=/post/${post.id}`" class="btn btn-edit">Sign in to comment</NuxtLink>
+          </div>
+
+          <ul v-if="comments && comments.length" class="comment-list">
+            <li v-for="comment in comments" :key="comment.id" class="comment-item">
+              <span class="avatar comment-avatar">{{ initials(commentAuthorName(comment)) }}</span>
+              <div class="comment-body">
+                <div class="comment-meta">
+                  <span class="comment-author">{{ commentAuthorName(comment) }}</span>
+                  <span class="meta-dot" aria-hidden="true"></span>
+                  <time :datetime="comment.created_at" class="comment-date">{{ formatDate(comment.created_at) }}</time>
+                </div>
+                <p class="comment-content">{{ comment.content }}</p>
+              </div>
+              <button
+                v-if="canDeleteComment(comment)"
+                type="button"
+                class="comment-delete"
+                :disabled="deletingCommentId === comment.id"
+                aria-label="Delete comment"
+                @click="removeComment(comment.id)"
+              >
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M2 4h10M5 4V2.5h4V4M5.5 6.5v4M8.5 6.5v4M3 4l.8 7.5h6.4L11 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </li>
+          </ul>
+          <p v-else class="comments-empty">No comments yet — be the first to share your thoughts.</p>
+        </section>
+
         <!-- End decoration -->
         <div class="article-end" aria-hidden="true">
           <span class="end-line"></span>
@@ -488,6 +555,34 @@ if (import.meta.client) {
 .article-body { font-family: var(--font-serif); font-size: 19px; line-height: 1.85; color: var(--text-secondary); }
 .article-body p { margin: 0; }
 .article-body p + p { margin-top: 1.4em; }
+
+/* Comments */
+.comments-section { margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--border); }
+.comments-header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+.comments-title { font-family: var(--font-sans); font-size: 18px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; }
+.comments-count { font-size: 12px; font-weight: 700; color: var(--text-tertiary); background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 2px 9px; }
+
+.comment-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+.comment-textarea { font-family: var(--font-sans); font-size: 14.5px; line-height: 1.6; padding: 13px 16px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); resize: vertical; min-height: 76px; transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast); }
+.comment-textarea::placeholder { color: var(--text-tertiary); }
+.comment-textarea:focus { outline: none; border-color: var(--accent); background: var(--bg-elevated); box-shadow: var(--shadow-accent); }
+.comment-form-actions { display: flex; justify-content: flex-end; }
+
+.comment-signin-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 18px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 32px; font-size: 14px; color: var(--text-secondary); }
+
+.comment-list { display: flex; flex-direction: column; gap: 20px; }
+.comment-item { display: flex; align-items: flex-start; gap: 12px; }
+.comment-avatar { font-size: 10px; flex-shrink: 0; }
+.comment-body { flex: 1; min-width: 0; }
+.comment-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.comment-author { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+.comment-date { font-size: 12px; color: var(--text-tertiary); }
+.comment-content { font-size: 14.5px; line-height: 1.65; color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; }
+.comment-delete { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-full); border: 1px solid transparent; background: transparent; color: var(--text-tertiary); cursor: pointer; transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast); }
+.comment-delete:hover:not(:disabled) { color: var(--color-error); background: rgba(240,96,96,0.1); border-color: rgba(240,96,96,0.25); }
+.comment-delete:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.comments-empty { font-size: 14px; color: var(--text-tertiary); }
 
 /* End + Back */
 .article-end { display: flex; align-items: center; gap: 16px; margin: 56px 0 40px; }
