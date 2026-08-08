@@ -3,8 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.post import Post
 from app.schemas.post import PostCreate, PostUpdate, PostDelete,  PostRead
-async def create_post(db: AsyncSession, data: PostCreate, user_id: int) -> Post:
-    post = Post(**data.model_dump(), user_id=user_id)
+async def create_post(db: AsyncSession, data: PostCreate, user_id: int, author: str) -> Post:
+    post = Post(**data.model_dump(), user_id=user_id, author=author)
     db.add(post)
     await db.commit()
     await db.refresh(post)

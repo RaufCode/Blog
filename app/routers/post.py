@@ -16,7 +16,8 @@ async def create_post(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return await post_crud.create_post(db, data, current_user.id)
+    author = f"{current_user.first_name} {current_user.last_name or ''}".strip()
+    return await post_crud.create_post(db, data, current_user.id, author)
 
 @router.get("/{post_id}", response_model=PostRead)
 async def read_post(post_id: int, db: AsyncSession = Depends(get_db)):
